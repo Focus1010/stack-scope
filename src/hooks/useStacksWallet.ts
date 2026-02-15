@@ -61,33 +61,40 @@ export function useStacksWallet() {
   }, []);
 
   // Connect
-  const connectWallet = useCallback(() => {
+  const connectWallet = useCallback(async () => {
     setIsLoading(true);
 
-    showConnect({
-      userSession,
-      appDetails: {
-        name: 'StackScope',
-        icon: window.location.origin + '/logo.png',
-      },
-      onFinish: () => {
-        const userData = userSession.loadUserData();
+    try {
+      // Use the correct @stacks/connect v8 API
+      const { connect } = await import('@stacks/connect');
+      
+      connect({
+        appDetails: {
+          name: 'StackScope',
+          icon: window.location.origin + '/logo.png',
+        },
+        onFinish: () => {
+          const userData = userSession.loadUserData();
 
-        const stxAddress =
-          userData.profile?.stxAddress?.mainnet ||
+          const stxAddress =
+            userData.profile?.stxAddress?.mainnet ||
             userData.profile?.stxAddress?.testnet;
 
-        if (stxAddress) {
-          setAddress(stxAddress);
-          setIsConnected(true);
-        }
+          if (stxAddress) {
+            setAddress(stxAddress);
+            setIsConnected(true);
+          }
 
-        setIsLoading(false);
-      },
-      onCancel: () => {
-        setIsLoading(false);
-      },
-    });
+          setIsLoading(false);
+        },
+        onCancel: () => {
+          setIsLoading(false);
+        },
+      });
+    } catch (error) {
+      console.error('Connection error:', error);
+      setIsLoading(false);
+    }
   }, []);
 
   // Disconnect
