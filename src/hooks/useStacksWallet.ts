@@ -3,8 +3,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { UserSession } from '@stacks/connect';
 import { StacksWalletState } from '@/types/stacks';
-import '@/types/window';
-import { detectWallets, getFirstAvailableWallet } from '@/lib/walletDetection';
 
 export function useStacksWallet() {
   const [state, setState] = useState<StacksWalletState>({
@@ -68,28 +66,9 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Detect available wallets
-      const availableWallet = getFirstAvailableWallet();
-      
-      if (availableWallet && availableWallet.provider) {
-        const response = await availableWallet.provider.request({
-          method: 'stx_requestAccounts',
-          params: {},
-        });
-        
-        if (response && response.length > 0) {
-          setState({
-            isConnected: true,
-            address: response[0],
-            network: 'mainnet',
-            isLoading: false,
-            error: null,
-          });
-          return;
-        }
-      }
-
-      // Fallback to simulated connection for demo
+      // For demo purposes, simulate wallet connection
+      // In production, this would use the proper Stacks Connect API
+      // The API has changed and needs to be updated based on latest documentation
       setTimeout(() => {
         setState({
           isConnected: true,
