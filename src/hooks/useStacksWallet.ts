@@ -100,12 +100,12 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Create authentication request
+      // Create authentication request using the correct API
       const authRequest = userSession.makeAuthRequest();
       debugLog('Auth request created', { authRequest });
       
-      // Redirect to wallet for authentication
-      userSession.redirectToAuth(authRequest);
+      // Use window.location.href to redirect to wallet
+      window.location.href = authRequest;
       debugLog('Redirected to wallet for authentication');
       
     } catch (error) {
