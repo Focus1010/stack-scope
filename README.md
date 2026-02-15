@@ -2,7 +2,7 @@
 
 A production-ready starter project for building a Stacks blockchain portfolio dashboard with Next.js, TypeScript, and Leather wallet integration.
 
-## 🚀 Features
+## Features
 
 - **Next.js 16** with App Router and TypeScript
 - **Tailwind CSS** for modern, responsive styling
@@ -11,7 +11,7 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 - **Production Ready** with ESLint, Prettier, and TypeScript
 - **Responsive Design** optimized for desktop and mobile
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js (App Router) + TypeScript
 - **Styling**: Tailwind CSS
@@ -20,13 +20,13 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 - **Package Manager**: pnpm
 - **Code Quality**: ESLint + Prettier
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+ 
 - pnpm (recommended) or npm/yarn
 - Leather wallet browser extension
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repository**
    ```bash
@@ -64,7 +64,7 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 stackscope/
@@ -72,18 +72,22 @@ stackscope/
 │   ├── app/                 # Next.js App Router pages
 │   ├── components/          # Reusable UI components
 │   │   ├── WalletButton.tsx
-│   │   └── ConnectionStatus.tsx
+│   │   ├── ConnectionStatus.tsx
+│   │   └── WalletSelector.tsx
 │   ├── hooks/              # Custom React hooks
 │   │   └── useStacksWallet.ts
 │   ├── types/              # TypeScript type definitions
-│   │   └── stacks.ts
+│   │   ├── stacks.ts
+│   │   └── window.ts
+│   ├── lib/                # Utility functions
+│   │   └── walletDetection.ts
 │   └── styles/             # Global styles
 ├── public/                 # Static assets
 ├── .env.example           # Environment variables template
 └── README.md
 ```
 
-## 🔧 Available Scripts
+## Available Scripts
 
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
@@ -91,7 +95,7 @@ stackscope/
 - `pnpm lint` - Run ESLint
 - `pnpm format` - Format code with Prettier
 
-## 🦊 Leather Wallet Integration
+## Leather Wallet Integration
 
 The app integrates with Leather wallet for Stacks blockchain interaction:
 
@@ -100,7 +104,17 @@ The app integrates with Leather wallet for Stacks blockchain interaction:
 3. **Connection Status**: Real-time connection status indicator
 4. **Disconnect**: Safely disconnect your wallet
 
-## 🌐 Network Configuration
+## Multi-Wallet Support
+
+The application supports multiple Stacks wallets:
+
+- **Leather**: Primary wallet with full feature support
+- **Xverse**: Mobile and desktop wallet compatibility
+- **Hiro**: Legacy wallet support
+
+The app automatically detects available wallets and provides a seamless connection experience.
+
+## Network Configuration
 
 By default, the app connects to the Stacks mainnet. You can change this in your environment variables:
 
@@ -109,14 +123,14 @@ NEXT_PUBLIC_STACKS_NETWORK=testnet  # For testnet
 NEXT_PUBLIC_STACKS_NETWORK=mainnet  # For mainnet (default)
 ```
 
-## 📱 Responsive Design
+## Responsive Design
 
 The application is fully responsive and works seamlessly on:
 - Desktop (1200px+)
 - Tablet (768px - 1199px)
 - Mobile (< 768px)
 
-## 🔮 Future Features
+## Future Features
 
 This foundation is ready for expansion:
 
@@ -126,7 +140,7 @@ This foundation is ready for expansion:
 - **DeFi Integration**: Stacking and liquidity pools
 - **Transaction History**: Detailed transaction logs
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -134,17 +148,17 @@ This foundation is ready for expansion:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Useful Links
+## Useful Links
 
 - [Stacks Documentation](https://docs.stacks.co/)
 - [Leather Wallet](https://leather.io/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-## 📞 Support
+## Support
 
 If you have any questions or need help, please open an issue on GitHub.
