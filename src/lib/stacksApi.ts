@@ -24,6 +24,42 @@ export interface AccountBalance {
   }>;
 }
 
+// Transaction interfaces
+export interface StacksTransaction {
+  id: string;
+  type: 'send' | 'receive' | 'contract' | 'other';
+  amount: string;
+  timestamp: number;
+  status: 'success' | 'pending' | 'failed';
+  from: string;
+  to: string;
+  fee: string;
+  memo?: string;
+  block_height?: number;
+  tx_type: string;
+}
+
+// Raw API transaction response
+interface RawTransaction {
+  tx_id: string;
+  tx_type: string;
+  tx_status: string;
+  block_height?: number;
+  block_time?: number;
+  fee_rate: string;
+  sender_address: string;
+  sponsor_address?: string;
+  recipient_address?: string;
+  amount?: string;
+  memo?: string;
+  token?: string;
+  operations?: Array<{
+    type: string;
+    address?: string;
+    amount?: string;
+  }>;
+}
+
 // API response interface
 interface ApiResponse {
   balance: string;
@@ -33,9 +69,18 @@ interface ApiResponse {
   lock_height: number | null;
 }
 
+// Transaction API response
+interface TransactionsApiResponse {
+  total: number;
+  results: RawTransaction[];
+}
+
 // Cache for balance data
 const balanceCache = new Map<string, { data: AccountBalance; timestamp: number }>();
 const CACHE_DURATION = 30000; // 30 seconds
+
+// Cache for transaction data
+const transactionCache = new Map<string, { data: StacksTransaction[]; timestamp: number }>();
 
 /**
  * Get the appropriate API URL based on network
@@ -125,4 +170,113 @@ export function formatStxBalance(balance: string): string {
 export function clearBalanceCache(): void {
   balanceCache.clear();
   console.log('[StacksAPI] Balance cache cleared');
+}
+
+/**
+ * Clear transaction cache (useful for debugging or force refresh)
+ */
+export function clearTransactionCache(): void {
+  transactionCache.clear();
+  console.log('[StacksAPI] Transaction cache cleared');
+}
+
+/**
+ * Normalize raw transaction data into clean format
+ */
+function normalizeTransaction(raw: RawTransaction, userAddress: string): StacksTransaction {
+  // Determine transaction type based on user's role
+  let type: 'send' | 'receive' | 'contract' | 'other';
+  
+  if (raw.tx_type === 'token_transfer') {
+    type = raw.sender_address === userAddress ? 'send' : 'receive';
+  } else if (raw.tx_type === 'smart_contract') {
+    type = 'contract';
+  } else {
+    type = 'other';
+  }
+
+  // Determine status
+  let status: 'success' | 'pending' | 'failed';
+  if (raw.tx_status === 'success') {
+    status = 'success';
+  } else if (raw.tx_status === 'pending') {
+    status = 'pending';
+  } else {
+    status = 'failed';
+  }
+
+  // Extract amount (handle different formats)
+  let amount = '0';
+  if (raw.amount) {
+    amount = raw.amount;
+  } else if (raw.operations && raw.operations.length > 0) {
+    const stxOp = raw.operations.find(op => op.type === 'stx_transfer');
+    if (stxOp && stxOp.amount) {
+      amount = stxOp.amount;
+    }
+  }
+
+  return {
+    id: raw.tx_id,
+    type,
+    amount,
+    timestamp: raw.block_time ? raw.block_time * 1000 : Date.now(), // Convert to milliseconds
+    status,
+    from: raw.sender_address,
+    to: raw.recipient_address || '',
+    fee: raw.fee_rate || '0',
+    memo: raw.memo,
+    block_height: raw.block_height,
+    tx_type: raw.tx_type,
+  };
+}
+
+/**
+ * Fetch wallet transactions from Stacks API
+ */
+export async function fetchWalletTransactions(
+  address: string,
+  network: 'mainnet' | 'testnet' = 'mainnet',
+  limit: number = 20
+): Promise<StacksTransaction[]> {
+  // Check cache first
+  const cacheKey = `${address}-${network}-${limit}`;
+  const cached = transactionCache.get(cacheKey);
+  
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`[StacksAPI] Using cached transactions for ${address}`);
+    return cached.data;
+  }
+
+  console.log(`[StacksAPI] Fetching transactions for ${address} on ${network} (limit: ${limit})`);
+  
+  const apiUrl = getApiUrl(network);
+  const url = `${apiUrl}/extended/v1/address/${address}/transactions?limit=${limit}&order=desc`;
+  
+  try {
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+    
+    const data: TransactionsApiResponse = await response.json();
+    
+    // Normalize transactions
+    const normalizedTransactions = data.results.map(raw => normalizeTransaction(raw, address));
+    
+    console.log(`[StacksAPI] Successfully fetched ${normalizedTransactions.length} transactions for ${address}`);
+    
+    // Cache the result
+    transactionCache.set(cacheKey, {
+      data: normalizedTransactions,
+      timestamp: Date.now(),
+    });
+    
+    return normalizedTransactions;
+    
+  } catch (error) {
+    console.error(`[StacksAPI] Error fetching transactions for ${address}:`, error);
+    throw new Error(`Failed to fetch transactions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

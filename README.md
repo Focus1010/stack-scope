@@ -128,6 +128,106 @@ StackScope fetches and displays your STX balance in real-time:
 - **Error Display**: Clear error messages if API fails
 - **Network Support**: Works with both mainnet and testnet
 
+## Transaction History
+
+StackScope provides a comprehensive transaction history data layer:
+
+- **API Integration**: Fetches transactions from Hiro Stacks API
+- **Transaction Types**: Identifies send, receive, contract, and other transactions
+- **Status Tracking**: Monitors success, pending, and failed transactions
+- **Data Normalization**: Clean, consistent transaction data format
+- **Caching**: 30-second cache for performance optimization
+
+### Transaction Features
+
+- **Type Detection**: Automatically categorizes transactions (send/receive/contract/other)
+- **Status Management**: Tracks transaction status (success/pending/failed)
+- **Amount Extraction**: Handles different transaction formats and operations
+- **Timestamp Conversion**: Converts blockchain time to readable timestamps
+- **Address Resolution**: Proper from/to address handling
+
+### Transaction Data Structure
+
+```typescript
+interface StacksTransaction {
+  id: string;                    // Transaction hash
+  type: 'send' | 'receive' | 'contract' | 'other';
+  amount: string;               // Amount in microSTX
+  timestamp: number;           // Unix timestamp in milliseconds
+  status: 'success' | 'pending' | 'failed';
+  from: string;                 // Sender address
+  to: string;                   // Recipient address
+  fee: string;                  // Transaction fee
+  memo?: string;                // Transaction memo
+  block_height?: number;        // Block height
+  tx_type: string;              // Raw transaction type
+}
+```
+
+### Usage Examples
+
+#### Using the Transaction Hook
+
+```typescript
+import { useStacksTransactions } from '@/hooks/useStacksTransactions';
+
+function TransactionHistory() {
+  const { address, network } = useStacksWallet();
+  const { transactions, isLoading, error, refetch } = useStacksTransactions(address, network, 20);
+
+  if (isLoading) return <div>Loading transactions...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h3>Recent Transactions</h3>
+      {transactions.map(tx => (
+        <div key={tx.id}>
+          {tx.type}: {tx.amount} STX ({tx.status})
+        </div>
+      ))}
+      <button onClick={refetch}>Refresh</button>
+    </div>
+  );
+}
+```
+
+#### Direct API Usage
+
+```typescript
+import { fetchWalletTransactions } from '@/lib/stacksApi';
+
+// Fetch transactions
+const transactions = await fetchWalletTransactions(
+  'SP1234567890abcdefghijklmnopqrstuvwxyz',
+  'mainnet',
+  20  // limit
+);
+
+// Transactions are normalized and ready to use
+transactions.forEach(tx => {
+  console.log(`${tx.type}: ${tx.amount} STX`);
+});
+```
+
+### API Endpoints Used
+
+- **Mainnet**: `https://api.mainnet.hiro.so/extended/v1/address/{address}/transactions`
+- **Testnet**: `https://api.testnet.hiro.so/extended/v1/address/{address}/transactions`
+
+### Caching Strategy
+
+- **Balance Cache**: 30 seconds per address/network combination
+- **Transaction Cache**: 30 seconds per address/network/limit combination
+- **Cache Invalidation**: Manual cache clearing available via `clearBalanceCache()` and `clearTransactionCache()`
+
+### Error Handling
+
+- **API Failures**: Graceful error messages with retry options
+- **Network Errors**: Automatic retry mechanisms
+- **Data Validation**: Type-safe parsing and validation
+- **Fallback States**: Empty states for no data scenarios
+
 ## Multi-Wallet Support
 
 The application supports multiple Stacks wallets:
