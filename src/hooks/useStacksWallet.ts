@@ -15,6 +15,33 @@ export function useStacksWallet() {
   const [isLoading, setIsLoading] = useState(false);
   const [network, setNetwork] = useState<'mainnet' | 'testnet'>('mainnet');
 
+  // Force check connection state
+  const forceCheckConnection = useCallback(() => {
+    console.log('[useStacksWallet] Force checking connection state...');
+    
+    if (userSession.isUserSignedIn()) {
+      console.log('[useStacksWallet] User is signed in, updating state...');
+      const userData = userSession.loadUserData();
+      console.log('[useStacksWallet] User data:', userData);
+
+      const stxAddress =
+        userData.profile?.stxAddress?.mainnet ||
+        userData.profile?.stxAddress?.testnet;
+
+      if (stxAddress) {
+        console.log('[useStacksWallet] Updating connected state:', stxAddress);
+        setAddress(stxAddress);
+        setIsConnected(true);
+        setIsLoading(false);
+      }
+    } else {
+      console.log('[useStacksWallet] User is not signed in, updating disconnected state...');
+      setAddress(null);
+      setIsConnected(false);
+      setIsLoading(false);
+    }
+  }, []);
+
   // Restore session on load
   useEffect(() => {
     async function restoreSession() {
@@ -69,6 +96,15 @@ export function useStacksWallet() {
     restoreSession();
   }, []);
 
+  // Add periodic check to ensure state stays in sync
+  useEffect(() => {
+    const interval = setInterval(() => {
+      forceCheckConnection();
+    }, 2000); // Check every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [forceCheckConnection]);
+
   // Connect
   const connectWallet = useCallback(async () => {
     console.log('[useStacksWallet] Starting wallet connection...');
@@ -90,20 +126,11 @@ export function useStacksWallet() {
           },
           onFinish: (payload: any) => {
             console.log('[useStacksWallet] Authentication finished, payload:', payload);
-            const userData = userSession.loadUserData();
-            console.log('[useStacksWallet] User data loaded after authentication:', userData);
-
-            const stxAddress =
-              userData.profile?.stxAddress?.mainnet ||
-              userData.profile?.stxAddress?.testnet;
-
-            if (stxAddress) {
-              console.log('[useStacksWallet] Setting address and connected state:', stxAddress);
-              setAddress(stxAddress);
-              setIsConnected(true);
-            }
-
-            setIsLoading(false);
+            
+            // Force check connection state immediately
+            setTimeout(() => {
+              forceCheckConnection();
+            }, 100);
           },
           onCancel: () => {
             console.log('[useStacksWallet] Authentication cancelled by user');
@@ -116,20 +143,11 @@ export function useStacksWallet() {
         stacksConnect.connect({
           onFinish: (payload: any) => {
             console.log('[useStacksWallet] Connection finished, payload:', payload);
-            const userData = userSession.loadUserData();
-            console.log('[useStacksWallet] User data loaded after connection:', userData);
-
-            const stxAddress =
-              userData.profile?.stxAddress?.mainnet ||
-              userData.profile?.stxAddress?.testnet;
-
-            if (stxAddress) {
-              console.log('[useStacksWallet] Setting address and connected state:', stxAddress);
-              setAddress(stxAddress);
-              setIsConnected(true);
-            }
-
-            setIsLoading(false);
+            
+            // Force check connection state immediately
+            setTimeout(() => {
+              forceCheckConnection();
+            }, 100);
           },
           onCancel: () => {
             console.log('[useStacksWallet] Connection cancelled by user');
@@ -148,10 +166,21 @@ export function useStacksWallet() {
 
   // Disconnect
   const disconnectWallet = useCallback(() => {
-    userSession.signUserOut();
-    setAddress(null);
-    setIsConnected(false);
-  }, []);
+    console.log('[useStacksWallet] Disconnecting wallet...');
+    try {
+      userSession.signUserOut();
+      console.log('[useStacksWallet] User signed out successfully');
+      
+      // Force check connection state immediately
+      setTimeout(() => {
+        forceCheckConnection();
+      }, 100);
+      
+      console.log('[useStacksWallet] State updated after disconnect');
+    } catch (error) {
+      console.error('[useStacksWallet] Disconnect error:', error);
+    }
+  }, [forceCheckConnection]);
 
   return {
     address,
