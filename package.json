@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "next": "16.1.6",
@@ -14,7 +15,8 @@
     "react-dom": "19.2.3",
     "@stacks/connect": "^8.2.4",
     "@stacks/wallet-sdk": "^7.2.0",
-    "@stacks/transactions": "^7.2.0"
+    "@stacks/transactions": "^7.2.0",
+    "@stacks/network": "^6.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
