@@ -5,6 +5,8 @@ import { useStacksWallet } from '@/hooks/useStacksWallet';
 export function ConnectionStatus() {
   const { isConnected, address, network, isLoading } = useStacksWallet();
 
+  console.log('[ConnectionStatus] State:', { isConnected, address, network, isLoading });
+
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
