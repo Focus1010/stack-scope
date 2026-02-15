@@ -5,8 +5,6 @@ import { useStacksWallet } from '@/hooks/useStacksWallet';
 export function WalletButton() {
   const { isConnected, isLoading, connectWallet, disconnectWallet } = useStacksWallet();
 
-  console.log('[WalletButton] State:', { isConnected, isLoading });
-
   if (isConnected) {
     return (
       <button

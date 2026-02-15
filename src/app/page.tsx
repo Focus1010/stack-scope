@@ -12,17 +12,16 @@ export default function Home() {
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-gray-900">StackScope</h1>
             </div>
-            <WalletButton />
+            <div className="flex items-center gap-4">
+              <ConnectionStatus />
+              <WalletButton />
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
-          <div className="mb-8">
-            <ConnectionStatus />
-          </div>
-          
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Stacks Portfolio Dashboard
