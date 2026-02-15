@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@stacks/auth':
+        specifier: ^7.3.1
+        version: 7.3.1
       '@stacks/connect':
         specifier: ^8.2.4
         version: 8.2.4(@types/react@19.2.14)(lit@3.3.0)(react@19.2.3)(typescript@5.9.3)(zod@4.3.6)

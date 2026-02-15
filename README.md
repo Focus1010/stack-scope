@@ -159,6 +159,44 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/)
 
+## Troubleshooting
+
+### Wallet Connection Issues
+
+**Problem: "Connecting..." state persists after wallet approval**
+- **Solution**: The app uses URL-based authentication. After approving in your wallet, the page will reload and automatically detect the authentication state.
+
+**Problem: Wallet popup doesn't appear**
+- **Solution**: Ensure you have Leather, Xverse, or Hiro wallet installed and enabled in your browser.
+
+**Problem: Connection lost on page refresh**
+- **Solution**: The app automatically restores sessions on load. Check browser console for authentication errors.
+
+**Problem: Console shows authentication errors**
+- **Solution**: Clear browser storage and try reconnecting. Check that your wallet is unlocked.
+
+### Debug Mode
+
+Enable debug logging to trace connection issues:
+- Open browser console (F12)
+- Look for `[StacksWallet]` prefixed logs
+- These logs show authentication flow details
+
+### Common Issues
+
+1. **Extension Not Installed**: Install Leather wallet from [leather.io](https://leather.io)
+2. **Wrong Network**: Ensure wallet is on the same network as the app (mainnet/testnet)
+3. **Browser Issues**: Try refreshing the page or clearing cache
+4. **Permission Denied**: Grant the app permission to access your wallet
+
+### Getting Help
+
+If you encounter issues:
+1. Check browser console for error messages
+2. Ensure your wallet is unlocked and on the correct network
+3. Try disconnecting and reconnecting
+4. Open an issue on GitHub with console logs
+
 ## Support
 
 If you have any questions or need help, please open an issue on GitHub.
