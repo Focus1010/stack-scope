@@ -1,9 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useStacksWallet } from '@/hooks/useStacksWallet';
+import { WalletSelector } from './WalletSelector';
 
 export function WalletButton() {
   const { isConnected, address, isLoading, error, connectWallet, disconnectWallet } = useStacksWallet();
+  const [showSelector, setShowSelector] = useState(false);
+
+  const handleConnect = (walletName: string) => {
+    connectWallet();
+  };
 
   if (isLoading) {
     return (
@@ -20,7 +27,7 @@ export function WalletButton() {
     return (
       <div className="flex flex-col gap-2">
         <button
-          onClick={connectWallet}
+          onClick={() => setShowSelector(true)}
           className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
         >
           Connect Wallet
@@ -50,11 +57,20 @@ export function WalletButton() {
   }
 
   return (
-    <button
-      onClick={connectWallet}
-      className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-    >
-      Connect Wallet
-    </button>
+    <>
+      <button
+        onClick={() => setShowSelector(true)}
+        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+      >
+        Connect Wallet
+      </button>
+      
+      {showSelector && (
+        <WalletSelector
+          onConnect={handleConnect}
+          onClose={() => setShowSelector(false)}
+        />
+      )}
+    </>
   );
 }

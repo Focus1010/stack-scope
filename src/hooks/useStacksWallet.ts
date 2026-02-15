@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { UserSession } from '@stacks/connect';
 import { StacksWalletState } from '@/types/stacks';
+import '@/types/window';
+import { detectWallets, getFirstAvailableWallet } from '@/lib/walletDetection';
 
 export function useStacksWallet() {
   const [state, setState] = useState<StacksWalletState>({
@@ -13,15 +15,22 @@ export function useStacksWallet() {
     error: null,
   });
 
-  const userSession = new UserSession({
-    appConfig: {
-      appDetails: {
-        name: 'StackScope',
-        icon: '/icon.png',
-        description: 'Stacks blockchain portfolio dashboard',
+  // Use useRef to prevent userSession recreation on every render
+  const userSessionRef = useRef<UserSession | null>(null);
+
+  if (!userSessionRef.current) {
+    userSessionRef.current = new UserSession({
+      appConfig: {
+        appDetails: {
+          name: 'StackScope',
+          icon: '/icon.png',
+          description: 'Stacks blockchain portfolio dashboard',
+        },
       },
-    },
-  });
+    });
+  }
+
+  const userSession = userSessionRef.current;
 
   const checkConnection = useCallback(() => {
     try {
@@ -59,8 +68,28 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Simulate wallet connection for demo purposes
-      // In production, this would integrate with Leather wallet
+      // Detect available wallets
+      const availableWallet = getFirstAvailableWallet();
+      
+      if (availableWallet && availableWallet.provider) {
+        const response = await availableWallet.provider.request({
+          method: 'stx_requestAccounts',
+          params: {},
+        });
+        
+        if (response && response.length > 0) {
+          setState({
+            isConnected: true,
+            address: response[0],
+            network: 'mainnet',
+            isLoading: false,
+            error: null,
+          });
+          return;
+        }
+      }
+
+      // Fallback to simulated connection for demo
       setTimeout(() => {
         setState({
           isConnected: true,
@@ -81,7 +110,10 @@ export function useStacksWallet() {
 
   const disconnectWallet = useCallback(() => {
     try {
-      userSession.signUserOut();
+      if (userSession.isUserSignedIn()) {
+        userSession.signUserOut();
+      }
+      
       setState({
         isConnected: false,
         address: null,
