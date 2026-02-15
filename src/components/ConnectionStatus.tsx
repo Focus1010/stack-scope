@@ -15,18 +15,15 @@ export function ConnectionStatus() {
   }
 
   if (isConnected && address) {
-    // Format address as SP12********XXXX
-    const formattedAddress = address.length > 10 
-      ? `${address.slice(0, 4)}${'*'.repeat(address.length - 8)}${address.slice(-4)}`
+    // Format address as SP25***VFF3 (only 3 asterisks)
+    const formattedAddress = address.length > 8 
+      ? `${address.slice(0, 4)}***${address.slice(-4)}`
       : address;
 
     return (
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <div className="flex flex-col">
-          <span className="text-gray-900 font-medium text-sm">{formattedAddress}</span>
-          <span className="text-gray-500 text-xs">Connected to {network}</span>
-        </div>
+        <span className="text-gray-900 font-medium text-sm">{formattedAddress}</span>
       </div>
     );
   }
