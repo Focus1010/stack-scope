@@ -69,14 +69,34 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Use UserSession directly for authentication
-      const authRequest = userSession.makeAuthRequest();
-      userSession.redirectToAuth(authRequest);
+      // Use the correct Stacks Connect API
+      const { connect } = await import('@stacks/connect');
       
-      // Check connection after redirect
-      setTimeout(() => {
-        checkConnection();
-      }, 2000);
+      connect({
+        appDetails: {
+          name: 'StackScope',
+          icon: '/icon.png',
+          description: 'Stacks blockchain portfolio dashboard',
+        },
+        onFinish: (payload: any) => {
+          console.log('Wallet connected successfully:', payload);
+          checkConnection();
+        },
+        onCancel: () => {
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            error: 'Connection cancelled by user'
+          }));
+        },
+        onClose: () => {
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            error: 'Connection popup closed'
+          }));
+        },
+      });
     } catch (error) {
       console.error('Wallet connection error:', error);
       setState(prev => ({
