@@ -100,13 +100,36 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // Create authentication request using the correct API
-      const authRequest = userSession.makeAuthRequest();
-      debugLog('Auth request created', { authRequest });
+      // Use Stacks Connect for proper wallet extension integration
+      const { connect } = await import('@stacks/connect');
       
-      // Use window.location.href to redirect to wallet
-      window.location.href = authRequest;
-      debugLog('Redirected to wallet for authentication');
+      connect({
+        appDetails: {
+          name: 'StackScope',
+          icon: '/icon.png',
+          description: 'Stacks blockchain portfolio dashboard',
+        },
+        onFinish: (payload: any) => {
+          debugLog('Wallet connected successfully', payload);
+          checkConnection();
+        },
+        onCancel: () => {
+          debugLog('Connection cancelled by user');
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            error: 'Connection cancelled by user'
+          }));
+        },
+        onClose: () => {
+          debugLog('Connection popup closed');
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            error: 'Connection popup closed'
+          }));
+        },
+      });
       
     } catch (error) {
       debugLog('Wallet connection error', error);
@@ -116,7 +139,7 @@ export function useStacksWallet() {
         isLoading: false,
       }));
     }
-  }, [debugLog]);
+  }, [debugLog, checkConnection]);
 
   // Disconnect wallet
   const disconnectWallet = useCallback(() => {
