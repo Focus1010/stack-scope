@@ -1,31 +1,33 @@
-import { WalletProvider, XverseProviders } from '@/types/window';
-
 export interface WalletInfo {
   name: string;
-  provider: WalletProvider | null;
   isInstalled: boolean;
   icon: string;
+  description: string;
+  installUrl: string;
 }
 
 export function detectWallets(): WalletInfo[] {
   const wallets: WalletInfo[] = [
     {
       name: 'Leather',
-      provider: typeof window !== 'undefined' ? window.LeatherProvider || null : null,
-      isInstalled: typeof window !== 'undefined' ? !!window.LeatherProvider : false,
+      isInstalled: typeof window !== 'undefined' && !!(window as any).LeatherProvider,
       icon: '🦊',
+      description: 'Popular Stacks wallet',
+      installUrl: 'https://leather.io/install',
     },
     {
       name: 'Xverse',
-      provider: typeof window !== 'undefined' ? window.XverseProviders?.StacksProvider || null : null,
-      isInstalled: typeof window !== 'undefined' ? !!window.XverseProviders : false,
+      isInstalled: typeof window !== 'undefined' && !!(window as any).XverseProviders,
       icon: '⚡',
+      description: 'Mobile and desktop wallet',
+      installUrl: 'https://www.xverse.app/download',
     },
     {
       name: 'Hiro',
-      provider: typeof window !== 'undefined' ? window.HiroWalletProvider || null : null,
-      isInstalled: typeof window !== 'undefined' ? !!window.HiroWalletProvider : false,
+      isInstalled: typeof window !== 'undefined' && !!(window as any).HiroWalletProvider,
       icon: '🗾',
+      description: 'Legacy Stacks wallet',
+      installUrl: 'https://hiro.so/wallet/install',
     },
   ];
 
@@ -38,11 +40,7 @@ export function getFirstAvailableWallet(): WalletInfo | null {
 }
 
 export function getWalletInstallUrl(walletName: string): string {
-  const installUrls: Record<string, string> = {
-    'Leather': 'https://leather.io/install',
-    'Xverse': 'https://www.xverse.app/download',
-    'Hiro': 'https://hiro.so/wallet/install',
-  };
-  
-  return installUrls[walletName] || 'https://www.stacks.co/wallets';
+  const wallets = detectWallets();
+  const wallet = wallets.find(w => w.name === walletName);
+  return wallet?.installUrl || 'https://www.stacks.co/wallets';
 }

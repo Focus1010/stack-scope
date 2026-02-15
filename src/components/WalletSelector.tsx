@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { detectWallets, getWalletInstallUrl } from '@/lib/walletDetection';
 
 interface WalletSelectorProps {
   onConnect: (walletName: string) => void;
@@ -9,36 +10,19 @@ interface WalletSelectorProps {
 
 export function WalletSelector({ onConnect, onClose }: WalletSelectorProps) {
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  
-  const wallets = [
-    {
-      name: 'Leather',
-      icon: '🦊',
-      description: 'Popular Stacks wallet',
-      installUrl: 'https://leather.io/install',
-    },
-    {
-      name: 'Xverse',
-      icon: '⚡',
-      description: 'Mobile and desktop wallet',
-      installUrl: 'https://www.xverse.app/download',
-    },
-    {
-      name: 'Hiro',
-      icon: '🗾',
-      description: 'Legacy Stacks wallet',
-      installUrl: 'https://hiro.so/wallet/install',
-    },
-  ];
+  const wallets = detectWallets();
 
   const handleWalletClick = (walletName: string) => {
-    setSelectedWallet(walletName);
-    onConnect(walletName);
-    onClose();
-  };
-
-  const handleInstallClick = (installUrl: string) => {
-    window.open(installUrl, '_blank');
+    const wallet = wallets.find(w => w.name === walletName);
+    if (wallet?.isInstalled) {
+      setSelectedWallet(walletName);
+      onConnect(walletName);
+      onClose();
+    } else {
+      // Open install page if wallet is not installed
+      const installUrl = getWalletInstallUrl(walletName);
+      window.open(installUrl, '_blank');
+    }
   };
 
   return (
@@ -62,15 +46,21 @@ export function WalletSelector({ onConnect, onClose }: WalletSelectorProps) {
                   <span className="text-2xl">{wallet.icon}</span>
                   <div>
                     <h4 className="font-medium">{wallet.name}</h4>
-                    <p className="text-sm text-gray-500">{wallet.description}</p>
+                    <p className="text-sm text-gray-500">
+                      {wallet.isInstalled ? 'Installed' : 'Not installed'}
+                    </p>
                   </div>
                 </div>
                 
                 <button
                   onClick={() => handleWalletClick(wallet.name)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    wallet.isInstalled
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
                 >
-                  Connect
+                  {wallet.isInstalled ? 'Connect' : 'Install'}
                 </button>
               </div>
             </div>

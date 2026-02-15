@@ -34,10 +34,13 @@ export function useStacksWallet() {
     try {
       if (userSession.isUserSignedIn()) {
         const userData = userSession.loadUserData();
+        const address = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
+        const network = userData.profile.stxAddress.mainnet ? 'mainnet' : 'testnet';
+        
         setState({
           isConnected: true,
-          address: userData.profile.stxAddress.mainnet,
-          network: userData.profile.stxAddress.mainnet ? 'mainnet' : 'testnet',
+          address: address,
+          network: network,
           isLoading: false,
           error: null,
         });
@@ -66,26 +69,37 @@ export function useStacksWallet() {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // For demo purposes, simulate wallet connection
-      // In production, this would use the proper Stacks Connect API
-      // The API has changed and needs to be updated based on latest documentation
-      setTimeout(() => {
-        setState({
-          isConnected: true,
-          address: 'SP1234567890ABCDEF1234567890ABCDEF12345678',
-          network: 'mainnet',
-          isLoading: false,
-          error: null,
-        });
-      }, 1500);
+      // Use the proper Stacks Connect API for real wallet connection
+      const { connect } = await import('@stacks/connect');
+      
+      connect({
+        appDetails: {
+          name: 'StackScope',
+          icon: '/icon.png',
+          description: 'Stacks blockchain portfolio dashboard',
+        },
+        userSession: userSession,
+        onFinish: (payload) => {
+          console.log('Wallet connected successfully:', payload);
+          checkConnection();
+        },
+        onCancel: () => {
+          setState(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            error: 'Connection cancelled by user'
+          }));
+        },
+      });
     } catch (error) {
+      console.error('Wallet connection error:', error);
       setState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to connect wallet',
         isLoading: false,
       }));
     }
-  }, []);
+  }, [userSession, checkConnection]);
 
   const disconnectWallet = useCallback(() => {
     try {
