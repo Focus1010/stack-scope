@@ -228,6 +228,81 @@ transactions.forEach(tx => {
 - **Data Validation**: Type-safe parsing and validation
 - **Fallback States**: Empty states for no data scenarios
 
+## UI Components
+
+### Transaction History
+
+StackScope includes a comprehensive transaction history component:
+
+**Features:**
+- **Responsive Design**: Desktop table / Mobile cards layout
+- **Transaction Types**: Visual indicators for send/receive/contract/other
+- **Status Indicators**: Icons and badges for success/pending/failed
+- **Time Formatting**: Relative timestamps (2h ago, Yesterday, etc.)
+- **Amount Display**: Color-coded (green for receive, red for send)
+- **Copy Functionality**: One-click transaction ID copying
+- **Loading States**: Animated skeleton placeholders
+- **Error Handling**: Clear error messages with retry buttons
+- **Empty States**: Friendly messages with CTA to first transaction
+
+**UI Screenshots:**
+
+```
+[Desktop Layout]
+┌─────────────────────────────────────────────────────────┐
+│ Transaction History                    [Refresh]        │
+├─────────────────────────────────────────────────────────┤
+│ 🟢 Sent     -1,000.00 STX    ✅ success  1h ago │
+│ ID: 0x1234567...abcdef            [Copy ID]   │
+├─────────────────────────────────────────────────────────┤
+│ 🟢 Received  +2,000.00 STX    ✅ success  2h ago │
+│ ID: 0x0987654...fedcba            [Copy ID]   │
+└─────────────────────────────────────────────────────────┘
+
+[Mobile Layout]
+┌─────────────────────┐
+│ Transaction History │
+│ [Refresh]         │
+├─────────────────────┤
+│ 🟢 Sent          │
+│ -1,000.00 STX   │
+│ ✅ success 1h ago │
+│ ID: 0x1234...def │
+│ [Copy]           │
+├─────────────────────┤
+│ 🟢 Received       │
+│ +2,000.00 STX   │
+│ ✅ success 2h ago │
+│ ID: 0x0987...cba │
+│ [Copy]           │
+└─────────────────────┘
+```
+
+**Component Structure:**
+```typescript
+// TransactionHistory.tsx
+- Responsive grid layout (desktop: 3-col, mobile: 1-col)
+- Loading skeleton with animated placeholders
+- Error state with retry functionality
+- Empty state with CTA to first transaction
+- Copy-to-clipboard for transaction IDs
+- Hover effects and smooth transitions
+- Accessibility with proper ARIA labels
+```
+
+### Dashboard Layout
+
+**Three-Column Grid:**
+- **Main Content** (2 columns): Portfolio overview and features
+- **Sidebar** (1 column): Balance card + Transaction history
+- **Responsive**: Stacked layout on mobile devices
+
+**Component Integration:**
+- **BalanceCard**: Real-time STX balance display
+- **TransactionHistory**: Comprehensive transaction list
+- **WalletButton**: Connect/disconnect functionality
+- **ConnectionStatus**: Real-time connection indicator
+
 ## Multi-Wallet Support
 
 The application supports multiple Stacks wallets:

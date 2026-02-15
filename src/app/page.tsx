@@ -3,6 +3,7 @@
 import { WalletButton } from '@/components/WalletButton';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { BalanceCard } from '@/components/BalanceCard';
+import { TransactionHistory } from '@/components/TransactionHistory';
 
 export default function Home() {
   return (
@@ -63,8 +64,9 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
               <BalanceCard />
+              <TransactionHistory />
             </div>
           </div>
         </div>
