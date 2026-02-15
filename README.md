@@ -7,9 +7,11 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 - **Next.js 16** with App Router and TypeScript
 - **Tailwind CSS** for modern, responsive styling
 - **Leather Wallet** integration for Stacks blockchain
+- **Real-time Balance Display** - Fetch and display STX balance from Stacks API
 - **Clean Architecture** with reusable components and hooks
 - **Production Ready** with ESLint, Prettier, and TypeScript
 - **Responsive Design** optimized for desktop and mobile
+- **Comprehensive Testing** with Vitest and API test coverage
 
 ## Tech Stack
 
@@ -94,15 +96,37 @@ stackscope/
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
 - `pnpm format` - Format code with Prettier
+- `pnpm test` - Run tests in watch mode
+- `pnpm test:run` - Run tests once
+- `pnpm test:ui` - Run tests with UI interface
 
 ## Leather Wallet Integration
 
 The app integrates with Leather wallet for Stacks blockchain interaction:
 
 1. **Connect Wallet**: Click "Connect Wallet" to authenticate
-2. **View Address**: See your connected Stacks address
-3. **Connection Status**: Real-time connection status indicator
-4. **Disconnect**: Safely disconnect your wallet
+2. **View Address**: See your connected Stacks address (formatted as SP25***VFF3)
+3. **Connection Status**: Real-time connection status with green/gray indicators
+4. **Balance Display**: View your STX balance fetched from Stacks API
+5. **Disconnect**: Safely disconnect your wallet
+
+## Balance Fetching
+
+StackScope fetches and displays your STX balance in real-time:
+
+- **API Integration**: Uses Stacks public API (mainnet/testnet)
+- **Caching**: 30-second cache to reduce API calls
+- **Error Handling**: Graceful error states with retry functionality
+- **Formatting**: Proper number formatting (e.g., 1,234.57 STX)
+- **Real-time Updates**: Balance updates when wallet connects/disconnects
+
+### Balance Features
+
+- **Automatic Fetching**: Balance loads when wallet connects
+- **Manual Refresh**: Click "Refresh" button to update balance
+- **Loading States**: Skeleton loaders during API calls
+- **Error Display**: Clear error messages if API fails
+- **Network Support**: Works with both mainnet and testnet
 
 ## Multi-Wallet Support
 
