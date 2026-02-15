@@ -75,37 +75,71 @@ export function useStacksWallet() {
     setIsLoading(true);
 
     try {
-      // Use the correct @stacks/connect v8 API
-      const { connect } = await import('@stacks/connect');
+      // Try different methods for @stacks/connect v8
+      const stacksConnect = await import('@stacks/connect');
       console.log('[useStacksWallet] @stacks/connect imported successfully');
+      console.log('[useStacksWallet] Available methods:', Object.keys(stacksConnect));
       
-      connect({
-        appDetails: {
-          name: 'StackScope',
-          icon: window.location.origin + '/logo.png',
-        },
-        onFinish: (payload: any) => {
-          console.log('[useStacksWallet] Connection finished, payload:', payload);
-          const userData = userSession.loadUserData();
-          console.log('[useStacksWallet] User data loaded after connection:', userData);
+      // Try using authenticate method if available
+      if (stacksConnect.authenticate) {
+        console.log('[useStacksWallet] Using authenticate method');
+        stacksConnect.authenticate({
+          appDetails: {
+            name: 'StackScope',
+            icon: window.location.origin + '/logo.png',
+          },
+          onFinish: (payload: any) => {
+            console.log('[useStacksWallet] Authentication finished, payload:', payload);
+            const userData = userSession.loadUserData();
+            console.log('[useStacksWallet] User data loaded after authentication:', userData);
 
-          const stxAddress =
-            userData.profile?.stxAddress?.mainnet ||
-            userData.profile?.stxAddress?.testnet;
+            const stxAddress =
+              userData.profile?.stxAddress?.mainnet ||
+              userData.profile?.stxAddress?.testnet;
 
-          if (stxAddress) {
-            console.log('[useStacksWallet] Setting address and connected state:', stxAddress);
-            setAddress(stxAddress);
-            setIsConnected(true);
-          }
+            if (stxAddress) {
+              console.log('[useStacksWallet] Setting address and connected state:', stxAddress);
+              setAddress(stxAddress);
+              setIsConnected(true);
+            }
 
-          setIsLoading(false);
-        },
-        onCancel: () => {
-          console.log('[useStacksWallet] Connection cancelled by user');
-          setIsLoading(false);
-        },
-      });
+            setIsLoading(false);
+          },
+          onCancel: () => {
+            console.log('[useStacksWallet] Authentication cancelled by user');
+            setIsLoading(false);
+          },
+        });
+      } else if (stacksConnect.connect) {
+        console.log('[useStacksWallet] Using connect method');
+        // Try minimal parameters
+        stacksConnect.connect({
+          onFinish: (payload: any) => {
+            console.log('[useStacksWallet] Connection finished, payload:', payload);
+            const userData = userSession.loadUserData();
+            console.log('[useStacksWallet] User data loaded after connection:', userData);
+
+            const stxAddress =
+              userData.profile?.stxAddress?.mainnet ||
+              userData.profile?.stxAddress?.testnet;
+
+            if (stxAddress) {
+              console.log('[useStacksWallet] Setting address and connected state:', stxAddress);
+              setAddress(stxAddress);
+              setIsConnected(true);
+            }
+
+            setIsLoading(false);
+          },
+          onCancel: () => {
+            console.log('[useStacksWallet] Connection cancelled by user');
+            setIsLoading(false);
+          },
+        });
+      } else {
+        console.error('[useStacksWallet] No connect or authenticate method found');
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error('[useStacksWallet] Connection error:', error);
       setIsLoading(false);
