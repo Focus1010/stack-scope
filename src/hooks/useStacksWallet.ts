@@ -32,10 +32,14 @@ export function useStacksWallet() {
 
   const checkConnection = useCallback(() => {
     try {
+      console.log('Checking wallet connection...');
+      
       if (userSession.isUserSignedIn()) {
         const userData = userSession.loadUserData();
         const address = userData.profile.stxAddress.mainnet || userData.profile.stxAddress.testnet;
         const network = userData.profile.stxAddress.mainnet ? 'mainnet' : 'testnet';
+        
+        console.log('Wallet is connected:', { address, network });
         
         setState({
           isConnected: true,
@@ -45,6 +49,7 @@ export function useStacksWallet() {
           error: null,
         });
       } else {
+        console.log('Wallet is not connected');
         setState(prev => ({
           ...prev,
           isConnected: false,
@@ -53,6 +58,7 @@ export function useStacksWallet() {
         }));
       }
     } catch (error) {
+      console.error('Error checking connection:', error);
       setState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to check wallet connection',
@@ -80,7 +86,10 @@ export function useStacksWallet() {
         },
         onFinish: (payload: any) => {
           console.log('Wallet connected successfully:', payload);
-          checkConnection();
+          // Force immediate connection check
+          setTimeout(() => {
+            checkConnection();
+          }, 100);
         },
         onCancel: () => {
           setState(prev => ({ 
@@ -97,6 +106,20 @@ export function useStacksWallet() {
           }));
         },
       });
+
+      // Also check connection periodically as fallback
+      const checkInterval = setInterval(() => {
+        if (userSession.isUserSignedIn()) {
+          clearInterval(checkInterval);
+          checkConnection();
+        }
+      }, 1000);
+
+      // Clear interval after 30 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+      }, 30000);
+
     } catch (error) {
       console.error('Wallet connection error:', error);
       setState(prev => ({
