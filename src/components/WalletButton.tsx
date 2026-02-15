@@ -1,76 +1,28 @@
 'use client';
 
-import { useState } from 'react';
 import { useStacksWallet } from '@/hooks/useStacksWallet';
-import { WalletSelector } from './WalletSelector';
 
 export function WalletButton() {
-  const { isConnected, address, isLoading, error, connectWallet, disconnectWallet } = useStacksWallet();
-  const [showSelector, setShowSelector] = useState(false);
+  const { isConnected, isLoading, connectWallet, disconnectWallet } = useStacksWallet();
 
-  const handleConnect = (walletName: string) => {
-    connectWallet();
-  };
-
-  if (isLoading) {
+  if (isConnected) {
     return (
       <button
-        disabled
-        className="px-6 py-3 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed"
+        onClick={disconnectWallet}
+        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
       >
-        Connecting...
+        Disconnect Wallet
       </button>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col gap-2">
-        <button
-          onClick={() => setShowSelector(true)}
-          className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-        >
-          Connect Wallet
-        </button>
-        <p className="text-red-500 text-sm">{error}</p>
-      </div>
-    );
-  }
-
-  if (isConnected && address) {
-    return (
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col items-end">
-          <span className="text-sm text-gray-500">Connected</span>
-          <span className="font-mono text-sm">
-            {address.slice(0, 6)}...{address.slice(-4)}
-          </span>
-        </div>
-        <button
-          onClick={disconnectWallet}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors"
-        >
-          Disconnect
-        </button>
-      </div>
     );
   }
 
   return (
-    <>
-      <button
-        onClick={() => setShowSelector(true)}
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-      >
-        Connect Wallet
-      </button>
-      
-      {showSelector && (
-        <WalletSelector
-          onConnect={handleConnect}
-          onClose={() => setShowSelector(false)}
-        />
-      )}
-    </>
+    <button
+      onClick={connectWallet}
+      disabled={isLoading}
+      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {isLoading ? 'Connecting...' : 'Connect Wallet'}
+    </button>
   );
 }

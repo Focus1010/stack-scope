@@ -68,51 +68,16 @@ export function useStacksWallet() {
   const connectWallet = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-    let timeoutId: NodeJS.Timeout;
-
     try {
-      // Use timeout to prevent infinite loading
-      timeoutId = setTimeout(() => {
-        setState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: 'Connection timeout. Please try again.'
-        }));
-      }, 30000); // 30 seconds timeout
-
-      // Try to use the Stacks Connect API with minimal config
-      const { connect } = await import('@stacks/connect');
+      // Use UserSession directly for authentication
+      const authRequest = userSession.makeAuthRequest();
+      userSession.redirectToAuth(authRequest);
       
-      connect({
-        manifest: {
-          name: 'StackScope',
-          icon: '/icon.png',
-          description: 'Stacks blockchain portfolio dashboard',
-        },
-        onFinish: (payload: any) => {
-          clearTimeout(timeoutId);
-          console.log('Wallet connected successfully:', payload);
-          checkConnection();
-        },
-        onCancel: () => {
-          clearTimeout(timeoutId);
-          setState(prev => ({ 
-            ...prev, 
-            isLoading: false,
-            error: 'Connection cancelled by user'
-          }));
-        },
-        onClose: () => {
-          clearTimeout(timeoutId);
-          setState(prev => ({ 
-            ...prev, 
-            isLoading: false,
-            error: 'Connection popup closed'
-          }));
-        },
-      });
+      // Check connection after redirect
+      setTimeout(() => {
+        checkConnection();
+      }, 2000);
     } catch (error) {
-      clearTimeout(timeoutId);
       console.error('Wallet connection error:', error);
       setState(prev => ({
         ...prev,
