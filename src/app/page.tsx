@@ -4,6 +4,7 @@ import { WalletButton } from '@/components/WalletButton';
 import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { BalanceCard } from '@/components/BalanceCard';
 import { TransactionHistory } from '@/components/TransactionHistory';
+import { WalletAnalytics } from '@/components/WalletAnalytics';
 
 export default function Home() {
   return (
@@ -24,7 +25,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
                 <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -67,6 +68,7 @@ export default function Home() {
             <div className="lg:col-span-1 space-y-6">
               <BalanceCard />
               <TransactionHistory />
+              <WalletAnalytics />
             </div>
           </div>
         </div>
