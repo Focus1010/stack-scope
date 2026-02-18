@@ -5,6 +5,7 @@ import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { BalanceCard } from '@/components/BalanceCard';
 import { TransactionHistory } from '@/components/TransactionHistory';
 import { WalletAnalytics } from '@/components/WalletAnalytics';
+import { ContractInterface } from '@/components/ContractInterface';
 
 export default function Home() {
   return (
@@ -25,7 +26,7 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
                 <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -37,7 +38,7 @@ export default function Home() {
                   and analyze your digital wealth in one comprehensive dashboard.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="bg-gray-50 rounded-lg p-6">
                     <div className="text-blue-600 text-3xl mb-2">📊</div>
                     <h3 className="font-semibold text-gray-900 mb-2">Portfolio Tracking</h3>
@@ -55,11 +56,17 @@ export default function Home() {
                     <h3 className="font-semibold text-gray-900 mb-2">Analytics</h3>
                     <p className="text-gray-600 text-sm">Deep insights into your blockchain activity</p>
                   </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="text-orange-600 text-3xl mb-2">📝</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Smart Notes</h3>
+                    <p className="text-gray-600 text-sm">Decentralized notes on the blockchain</p>
+                  </div>
                 </div>
 
                 <div className="border-t border-gray-200 pt-8">
                   <p className="text-gray-500 text-sm">
-                    Connect your Leather wallet to get started with your portfolio analysis.
+                    Connect your Leather wallet to get started with your portfolio analysis and smart notes.
                   </p>
                 </div>
               </div>
@@ -70,6 +77,11 @@ export default function Home() {
               <TransactionHistory />
               <WalletAnalytics />
             </div>
+          </div>
+          
+          {/* Contract Interface Section */}
+          <div className="mt-12">
+            <ContractInterface />
           </div>
         </div>
       </main>

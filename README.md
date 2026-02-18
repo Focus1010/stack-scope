@@ -12,12 +12,15 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 - **Production Ready** with ESLint, Prettier, and TypeScript
 - **Responsive Design** optimized for desktop and mobile
 - **Comprehensive Testing** with Vitest and API test coverage
+- **Smart Contract Support** - StackScope Notes Clarity contract included
 
 ## Tech Stack
 
 - **Frontend**: Next.js (App Router) + TypeScript
 - **Styling**: Tailwind CSS
 - **Blockchain**: Stacks (Clarity smart contracts ready)
+- **Testing**: Vitest + React Testing Library
+- **Smart Contracts**: Clarity with automated deployment
 - **Wallet**: Leather (formerly Hiro) wallet integration
 - **Package Manager**: pnpm
 - **Code Quality**: ESLint + Prettier
@@ -65,6 +68,71 @@ A production-ready starter project for building a Stacks blockchain portfolio da
 
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Smart Contract Deployment
+
+### StackScope Notes Contract
+
+This project includes the `stackscope-notes` Clarity smart contract for storing notes on the Stacks blockchain.
+
+#### Quick Deploy (One Command)
+
+1. **Set up environment**
+   ```bash
+   # Copy the template and add your mnemonic
+   cp env-setup.txt .env.local
+   # Edit .env.local with your actual wallet mnemonic
+   ```
+
+2. **Deploy to testnet**
+   ```bash
+   pnpm deploy:testnet
+   ```
+
+3. **Verify deployment**
+   ```bash
+   node scripts/verify-deploy.js <CONTRACT_ADDRESS> <TXID>
+   ```
+
+#### Manual Deployment
+
+1. **Visit Stacks Explorer**: https://explorer.stacks.co/
+2. **Connect wallet** (testnet mode)
+3. **Deploy contract**: Upload `contracts/stackscope-notes.clar`
+4. **Contract name**: `stackscope-notes`
+5. **Fee**: `0.001 STX`
+
+#### Contract Features
+
+- **Add notes** linked to transaction IDs
+- **Update notes** with new content
+- **Delete notes** when no longer needed
+- **Owner-only access** for note management
+- **Error handling** with proper error codes
+- **Gas optimized** for minimal fees
+
+#### Contract Functions
+
+```clarity
+;; Add a note
+(define-public (add-note (tx-id (buff 32) note (string 200)))
+
+;; Update a note  
+(define-public (update-note (tx-id (buff 32) note (string 200)))
+
+;; Delete a note
+(define-public (delete-note (tx-id (buff 32)))
+
+;; Get a note
+(define-read-only (get-note (tx-id (buff 32)))
+```
+
+#### Deployment Output
+
+After deployment, you'll receive:
+- **Contract Address**: `ST...` (testnet format)
+- **Transaction ID**: `0x...` (64-character hex)
+- **Explorer Link**: Direct verification link
 
 ## Project Structure
 

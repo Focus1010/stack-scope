@@ -1,5 +1,8 @@
 import { StacksTransaction } from './stacksApi';
 
+// In-memory storage for contracts
+const contractMap = new Map<string, ClarityContract>();
+
 // Clarity contract interface
 export interface ClarityContract {
   id: string;
@@ -29,8 +32,10 @@ export interface ContractNote {
 // Contract data model
 export interface ContractData {
   contract: ClarityContract;
+  contracts: ClarityContract[];
   notes: ContractNote[];
   balance: string;
+  netBalance: string;
   totalSent: string;
   totalReceived: string;
   transactionCount: number;
@@ -51,7 +56,7 @@ export function getContractNotes(transactions: StacksTransaction[]): ContractNot
     .map(tx => ({
       id: tx.id,
       note: tx.memo || '',
-      txId: tx.tx_id,
+      txId: tx.id,
       owner: tx.from,
       timestamp: tx.timestamp,
       content: tx.memo || '',
@@ -90,7 +95,7 @@ export function getContractData(transactions: StacksTransaction[]): ContractData
         description: tx.memo || 'Smart contract deployment',
         balance: tx.amount || '0',
         owner: tx.from || '',
-        txId: tx.tx_id,
+        txId: tx.id,
         blockHeight: tx.block_height || 0,
         timestamp: tx.timestamp,
         status: tx.status,
@@ -102,7 +107,7 @@ export function getContractData(transactions: StacksTransaction[]): ContractData
   const contracts = Array.from(contractMap.values());
   const totalSent = contracts.reduce((sum, contract) => parseInt(contract.balance, 10), 0).toString();
   const totalReceived = contracts.reduce((sum, contract) => parseInt(contract.balance, 10), 0).toString();
-  const totalFeesSpent = contracts.reduce((sum, contract) => parseInt(contract.fee || '0', 10)).toString();
+  const totalFeesSpent = contractTransactions.reduce((sum, tx) => sum + parseInt(tx.fee || '0', 10), 0).toString();
   const transactionCount = contractTransactions.length;
 
   // Find largest contract by balance
@@ -116,13 +121,20 @@ export function getContractData(transactions: StacksTransaction[]): ContractData
   contracts.sort((a, b) => parseInt(b.balance, 10) - parseInt(a.balance, 10));
 
   return {
+    contract: contracts[0],
     contracts,
+    notes: [],
+    balance: contracts[0]?.balance || '0',
+    netBalance: (parseInt(totalReceived, 10) - parseInt(totalSent, 10)).toString(),
     totalSent,
     totalReceived,
-    netBalance: (parseInt(totalReceived, 10) - parseInt(totalSent, 10)).toString(),
     transactionCount,
     totalFeesSpent,
-    largestTransaction,
+    largestTransaction: {
+      amount: largestContract.balance,
+      timestamp: largestContract.timestamp,
+      id: largestContract.id,
+    },
   };
 }
 
@@ -132,16 +144,34 @@ export function getContractData(transactions: StacksTransaction[]): ContractData
 export function addContractNote(
   contractId: string,
   note: string,
-  owner: string
+  owner: string,
   timestamp: number
 ): ContractNote {
+  const contract: ClarityContract = {
+    id: contractId,
+    principal: owner,
+    code: '',
+    name: 'Contract Note',
+    description: note,
+    balance: '0',
+    owner,
+    txId: contractId,
+    blockHeight: 0,
+    timestamp,
+    status: 'success',
+    note,
+  };
+  
+  contractMap.set(contractId, contract);
+  
   return {
     id: contractId,
     note,
+    txId: contractId,
     owner,
     timestamp,
+    content: note,
   };
-  }
 }
 
 /**
@@ -152,14 +182,13 @@ export function updateContractNote(
   note: string,
   timestamp: number
 ): void {
-  // Find the contract
   const contract = contractMap.get(contractId);
-  if (!contract) return;
-
-  // Update the note
-  contract.note = note;
-  contract.timestamp = Date.now();
-  contractMap.set(contractId, contract);
+  if (contract) {
+    contract.note = note;
+    contract.description = note;
+    contract.timestamp = timestamp;
+    contractMap.set(contractId, contract);
+  }
 }
 
 /**

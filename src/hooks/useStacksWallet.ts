@@ -139,7 +139,7 @@ export function useStacksWallet() {
         });
       } else if (stacksConnect.connect) {
         console.log('[useStacksWallet] Using connect method');
-        // Try minimal parameters
+        // Use the correct connect API
         stacksConnect.connect({
           onFinish: (payload: any) => {
             console.log('[useStacksWallet] Connection finished, payload:', payload);
@@ -153,7 +153,7 @@ export function useStacksWallet() {
             console.log('[useStacksWallet] Connection cancelled by user');
             setIsLoading(false);
           },
-        });
+        } as any);
       } else {
         console.error('[useStacksWallet] No connect or authenticate method found');
         setIsLoading(false);

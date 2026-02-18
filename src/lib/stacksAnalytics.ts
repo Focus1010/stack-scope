@@ -119,7 +119,7 @@ export function calculateWalletAnalytics(transactions: StacksTransaction[]): Wal
     totalReceived,
     netBalance: netBalanceNum.toString(),
     transactionCount: transactions.length,
-    totalFeesSpent,
+    totalFeesSpent: totalFees,
     largestTransaction,
     sevenDayStats: {
       sent: sevenDayTransactions.filter(tx => tx.type === 'send').length,

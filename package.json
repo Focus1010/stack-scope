@@ -10,7 +10,15 @@
     "format": "prettier --write .",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "deploy": "node scripts/simple-deploy.js",
+    "deploy:web": "node scripts/web-deploy-server.js",
+    "deploy:clarinet": "node scripts/clarinet-deploy.js",
+    "deploy:testnet": "node scripts/deploy-clarinet.js",
+    "deploy:direct": "node scripts/direct-deploy.js",
+    "deploy:cli": "node scripts/cli-deploy.js",
+    "verify": "node scripts/verify-deploy.js",
+    "setup": "node scripts/setup-deployment.js"
   },
   "dependencies": {
     "@stacks/auth": "^7.3.1",
@@ -23,6 +31,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@stacks/clarinet-sdk": "^3.14.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

@@ -151,20 +151,13 @@
 
 ;; Read-only functions
 (define-read-only (get-note)
-  (owner principal)
   (txid (buff 32))
   (response (string-utf8 200))
   (begin
-    (let ((note-id (buff 32)) (note-owner principal) (note-timestamp uint)))
-      (match (map-get? notes txid)
-        note-entry
-        (begin
-          (ok (get note note-entry))
-        )
-        (default
-          (err ERR-NOT-FOUND)
-        )
-      )
+    (match (map-get? notes txid)
+      note-entry
+      (ok (get note note-entry))
+      (err ERR-NOT-FOUND)
     )
   )
 )
@@ -174,11 +167,7 @@
   (owner principal)
   (response (list (string-utf8 200)))
   (begin
-    (let ((note-id (buff 32)) (note-owner principal) (note-timestamp uint)))
-      (begin
-        (ok (map-values notes))
-      )
-    )
+    (ok (map-values notes))
   )
 )
 

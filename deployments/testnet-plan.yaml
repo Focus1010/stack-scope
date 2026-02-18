@@ -1,0 +1,28 @@
+# Auto-generated deployment plan
+{
+  "id": 1771263013941,
+  "name": "StackScope Notes Testnet Deployment",
+  "network": "testnet",
+  "stacks_node": "https://api.testnet.hiro.so",
+  "bitcoin_node": "https://api.testnet.hiro.so",
+  "plan": {
+    "batches": [
+      {
+        "id": 0,
+        "transactions": [
+          {
+            "contract-publish": {
+              "contract-name": "stackscope-notes",
+              "expected-sender": "DEPLOYER_ADDRESS_WILL_BE_GENERATED",
+              "cost": 1000,
+              "path": "contracts/stackscope-notes.clar",
+              "anchor-block-only": true,
+              "clarity-version": 2
+            }
+          }
+        ],
+        "epoch": "2.5"
+      }
+    ]
+  }
+}

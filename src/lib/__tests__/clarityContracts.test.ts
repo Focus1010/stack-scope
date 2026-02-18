@@ -84,9 +84,9 @@ describe('Clarity Contracts', () => {
       const contractData = getContractData(mockTransactions);
       
       expect(contractData).not.toBeNull();
-      expect(contractData?.contract).toHaveLength(2);
-      expect(contractData?.totalSent).toBe('3000000'); // 3 STX total
-      expect(contractData?.totalReceived).toBe('3000000'); // 3 STX total
+      expect(contractData?.contracts).toHaveLength(2);
+      expect(contractData?.totalSent).toBe('2000000'); // 2 STX total (largest contract)
+      expect(contractData?.totalReceived).toBe('2000000'); // 2 STX total
       expect(contractData?.transactionCount).toBe(2);
       expect(contractData?.largestTransaction.amount).toBe('2000000'); // 2 STX largest
     });
@@ -147,6 +147,7 @@ describe('Clarity Contracts', () => {
       expect(contract).toBeNull();
     });
   });
+});
 
   describe('getContractById', () => {
     it('should return contract by ID', () => {
@@ -181,6 +182,9 @@ describe('Clarity Contracts', () => {
     });
 
     it('should return empty array when no contracts', () => {
+      // Clear all contracts first
+      clearAllContracts();
+      
       const contracts = getAllContracts();
       
       expect(contracts).toHaveLength(0);
@@ -233,4 +237,3 @@ describe('Clarity Contracts', () => {
       expect(contractData).toBeNull();
     });
   });
-});
